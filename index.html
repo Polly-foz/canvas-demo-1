@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>canvas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        let canvas = document.getElementById('canvas')
+        let ctx = canvas.getContext('2d')
+
+        canvas.setAttribute('width',window.innerWidth)
+        canvas.setAttribute('height',window.innerHeight)
+
+        ctx.lineWidth = 10
+        ctx.lineCap = "round"
+
+        let painting = false
+        let last
+
+        let isTouch = (('ontouchstart' in window) || (navigator.msMaxTouchPoints > 0))
+        console.log(isTouch?"mobile":"pc")
+
+        window.onresize = (e) => {
+            //获取画布的图像信息,一个副本
+            var data=ctx.getImageData(0,0,canvas.getAttribute('width'),canvas.getAttribute('height'))
+
+            //重新设置画布的大小
+            canvas.setAttribute("width",window.innerWidth)
+            canvas.setAttribute("height",window.innerHeight)
+            //将获得的图像副本,重新绘制到画布,完成画布的大小改变            
+            ctx.lineWidth = 10
+            ctx.lineCap = "round"
+            ctx.putImageData(data,0,0)
+
+        }
+
+        if(isTouch){
+            canvas.ontouchstart = (e) => {
+                last = [e.touches[0].clientX, e.touches[0].clientY]
+            }
+            canvas.ontouchmove = (e) => {
+                let x = e.touches[0].clientX
+                let y = e.touches[0].clientY
+                drawline(last[0],last[1],x,y)
+                last = [x,y]
+            }
+        }else{
+            canvas.onmousedown = (e)=>{
+                console.log("onmousedown")
+                painting = true
+                last = [e.clientX,e.clientY]
+                console.log(last)
+            }
+            canvas.onmousemove = (e)=>{
+                if(painting === true){
+                    console.log("onmousemove")
+                    let x = e.clientX
+                    let y = e.clientY
+                    drawline(last[0],last[1],x,y)
+                    last = [x,y]
+                }
+                
+            }
+            canvas.onmouseup = ()=>{
+                console.log("onmouseup")
+                painting = false
+            }
+        }
+
+        function drawline(x1,y1,x2,y2) {
+            ctx.beginPath()
+            ctx.moveTo(x1, y1)
+            ctx.lineTo(x2, y2)
+            ctx.stroke()
+        }
+
+
+
+        canvas.onmousedown
+        
+    </script>
+</body>
+</html>
